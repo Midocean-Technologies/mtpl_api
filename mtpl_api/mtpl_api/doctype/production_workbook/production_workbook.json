@@ -1,0 +1,260 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "PW.####",
+ "creation": "2023-09-01 19:19:13.566133",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "posting_date",
+  "work_order",
+  "item",
+  "workstation",
+  "bom",
+  "auto_transfer_rm",
+  "column_break_2",
+  "posting_time",
+  "operation",
+  "qty__kg_",
+  "qty__nos_",
+  "qty_sfg",
+  "pending_qty",
+  "employee",
+  "column_break_8",
+  "daily_production_plan",
+  "from_time",
+  "to_time",
+  "job_card",
+  "stock_entry",
+  "rejection_qty__nos_",
+  "rejection_qty__kg_",
+  "from_jobcard",
+  "machine_qty",
+  "section_break_12",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Posting Date"
+  },
+  {
+   "fieldname": "work_order",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Work Order",
+   "options": "Work Order",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "work_order.production_item",
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "workstation",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Workstation",
+   "options": "Workstation"
+  },
+  {
+   "fieldname": "bom",
+   "fieldtype": "Link",
+   "label": "BOM",
+   "options": "BOM"
+  },
+  {
+   "default": "0",
+   "fieldname": "auto_transfer_rm",
+   "fieldtype": "Check",
+   "label": "Auto Transfer RM"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "posting_time",
+   "fieldtype": "Time",
+   "label": "Posting Time"
+  },
+  {
+   "fieldname": "operation",
+   "fieldtype": "Link",
+   "label": "Operation",
+   "options": "Operation",
+   "reqd": 1
+  },
+  {
+   "fieldname": "qty__kg_",
+   "fieldtype": "Float",
+   "label": "Qty ( KG )",
+   "reqd": 1
+  },
+  {
+   "fieldname": "qty__nos_",
+   "fieldtype": "Float",
+   "label": "Qty ( Nos )",
+   "reqd": 1
+  },
+  {
+   "fieldname": "qty_sfg",
+   "fieldtype": "Float",
+   "label": "Qty (SFG)"
+  },
+  {
+   "fieldname": "pending_qty",
+   "fieldtype": "Float",
+   "label": "Pending Qty"
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "column_break_8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "daily_production_plan",
+   "fieldtype": "Data",
+   "label": "Daily Production Plan"
+  },
+  {
+   "fieldname": "from_time",
+   "fieldtype": "Datetime",
+   "label": "From Time"
+  },
+  {
+   "fieldname": "to_time",
+   "fieldtype": "Datetime",
+   "label": "To Time"
+  },
+  {
+   "fieldname": "job_card",
+   "fieldtype": "Link",
+   "label": "Job Card",
+   "options": "Job Card",
+   "read_only": 1
+  },
+  {
+   "fieldname": "stock_entry",
+   "fieldtype": "Link",
+   "label": "Stock Entry",
+   "options": "Stock Entry",
+   "read_only": 1
+  },
+  {
+   "fieldname": "rejection_qty__nos_",
+   "fieldtype": "Float",
+   "label": "Rejection Qty ( Nos )"
+  },
+  {
+   "fieldname": "rejection_qty__kg_",
+   "fieldtype": "Float",
+   "label": "Rejection Qty ( Kg )"
+  },
+  {
+   "default": "0",
+   "fieldname": "from_jobcard",
+   "fieldtype": "Check",
+   "label": "From Jobcard",
+   "read_only": 1
+  },
+  {
+   "fieldname": "machine_qty",
+   "fieldtype": "Float",
+   "label": "Machine Qty"
+  },
+  {
+   "fieldname": "section_break_12",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Production Workbook",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2023-09-01 19:19:13.566133",
+ "modified_by": "Administrator",
+ "module": "Mtpl Api",
+ "name": "Production Workbook",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "print": 1,
+   "read": 1,
+   "role": "Mobile App Permission",
+   "select": 1,
+   "share": 1
+  },
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "print": 1,
+   "read": 1,
+   "role": "BrassERP Production",
+   "select": 1,
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Manufacturing User",
+   "select": 1,
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
