@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include mtpl_api *.css
+recursive-include mtpl_api *.csv
+recursive-include mtpl_api *.html
+recursive-include mtpl_api *.ico
+recursive-include mtpl_api *.js
+recursive-include mtpl_api *.json
+recursive-include mtpl_api *.md
+recursive-include mtpl_api *.png
+recursive-include mtpl_api *.py
+recursive-include mtpl_api *.svg
+recursive-include mtpl_api *.txt
+recursive-exclude mtpl_api *.pyc
