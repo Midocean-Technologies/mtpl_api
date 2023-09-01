@@ -2,9 +2,9 @@ from . import __version__ as app_version
 
 app_name = "mtpl_api"
 app_title = "Mtpl Api"
-app_publisher = "Midocean"
+app_publisher = "Midocean Technologies Pvt Ltd"
 app_description = "Mtpl Api"
-app_email = "midocean@gmail.com"
+app_email = "sagar@midocean.tech"
 app_license = "MIT"
 
 # Includes in <head>
