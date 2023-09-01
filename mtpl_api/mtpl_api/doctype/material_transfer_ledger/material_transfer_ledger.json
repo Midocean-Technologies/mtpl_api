@@ -1,0 +1,116 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "MTL.####",
+ "creation": "2023-09-01 19:04:28.976155",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "work_order",
+  "item",
+  "for_fg_transferred_qty",
+  "column_break_xldu1",
+  "bom",
+  "wo_qty_kgs",
+  "wo_qty_nos",
+  "section_break_zu5cm",
+  "purpose",
+  "stock_entry",
+  "child_material_transfer"
+ ],
+ "fields": [
+  {
+   "default": "Today",
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date"
+  },
+  {
+   "fieldname": "work_order",
+   "fieldtype": "Link",
+   "label": "Work Order",
+   "options": "Work Order"
+  },
+  {
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "label": "Item",
+   "options": "Item"
+  },
+  {
+   "fieldname": "for_fg_transferred_qty",
+   "fieldtype": "Float",
+   "label": "For FG Transferred Qty"
+  },
+  {
+   "fieldname": "column_break_xldu1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "bom",
+   "fieldtype": "Link",
+   "label": "BOM",
+   "options": "BOM"
+  },
+  {
+   "fieldname": "wo_qty_kgs",
+   "fieldtype": "Float",
+   "label": "WO Qty (Kgs)"
+  },
+  {
+   "fieldname": "wo_qty_nos",
+   "fieldtype": "Float",
+   "label": "WO Qty (Nos)"
+  },
+  {
+   "fieldname": "section_break_zu5cm",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "purpose",
+   "fieldtype": "Data",
+   "label": "Purpose"
+  },
+  {
+   "fieldname": "stock_entry",
+   "fieldtype": "Link",
+   "label": "Stock Entry",
+   "options": "Stock Entry",
+   "read_only": 1
+  },
+  {
+   "fieldname": "child_material_transfer",
+   "fieldtype": "Table",
+   "label": "Child Material Transfer",
+   "options": "Child Material Transfer"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-09-01 19:08:41.415337",
+ "modified_by": "Administrator",
+ "module": "Mtpl Api",
+ "name": "Material Transfer Ledger",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
