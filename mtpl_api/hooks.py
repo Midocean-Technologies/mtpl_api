@@ -66,6 +66,8 @@ app_license = "MIT"
 # before_install = "mtpl_api.install.before_install"
 # after_install = "mtpl_api.install.after_install"
 
+after_migrate = "mtpl_api.install.after_install"
+
 # Uninstallation
 # ------------
 

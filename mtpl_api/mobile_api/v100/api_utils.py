@@ -2,7 +2,6 @@ import frappe
 from bs4 import BeautifulSoup
 from frappe import _
 from frappe.utils import cstr
-
 import wrapt
 
 def gen_response(status, message, data=[]):
