@@ -317,3 +317,14 @@ def get_qc_template(item, operation):
     except Exception as e:
         return exception_handler(e)
     
+    
+@frappe.whitelist()
+@mtpl_validate(methods=["GET"])
+def get_workorder_record(record):
+    try:  
+        data = frappe.get_doc("Work Order",record,fields= ["*"])
+        gen_response(200,"Work order get successfully" ,data)
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted for work order")
+    except Exception as e:
+        return exception_handler(e)
