@@ -328,3 +328,26 @@ def get_workorder_record(record):
         return gen_response(500, "Not permitted for work order")
     except Exception as e:
         return exception_handler(e)
+    
+@frappe.whitelist()
+@mtpl_validate(methods=["GET"])
+def get_crm_html():
+    try:
+        crm_html = """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>CRM Page</title>
+        </head>
+        <body>
+            <h1>Welcome to the CRM Module</h1>
+            <p>This is a simple HTML page for the CRM module in Frappe.</p>
+            
+        </body>
+        </html>
+        """
+        gen_response(200 , crm_html)
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
