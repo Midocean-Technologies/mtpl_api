@@ -4,7 +4,7 @@ import calendar
 import frappe
 from frappe import _
 from frappe.auth import LoginManager
-from mtpl_api.mobile_api.v100.api_utils import gen_response, exception_handler, generate_key, mtpl_validate
+from mtpl_api.mobile_api.v1.api_utils import gen_response, exception_handler, generate_key, mtpl_validate
 from erpnext.stock.doctype.batch.batch import get_batch_qty
 from frappe.utils import flt, now, now_datetime, get_first_day, get_last_day, get_year_start, get_year_ending, time_diff_in_seconds, format_date
 
@@ -347,6 +347,32 @@ def get_crm_html():
         </html>
         """
         gen_response(200 , crm_html)
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
+    
+
+@frappe.whitelist()
+@mtpl_validate(methods=["GET"])
+def fetch_event_record(reference_docname):
+    try:
+        doc = frappe.get_list('Event Participants', filters={"reference_docname": reference_docname}, fields=["*"])
+        if not len(doc):
+            return gen_response(200 ,"No Data Found", doc)
+        gen_response(200 ,"Data Fetch Succsfully", doc)
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
+
+
+@frappe.whitelist()
+@mtpl_validate(methods=["GET"])
+def fetch_comment_record(lead_name):
+    try:
+        doc = frappe.get_list('CRM Note', filters={"parent": lead_name}, fields=["*"])
+        gen_response(200 ,"Data Fetch Succsfully", doc)
     except frappe.PermissionError:
         return gen_response(500, "Not permitted")
     except Exception as e:
