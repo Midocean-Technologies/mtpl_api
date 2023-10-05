@@ -1,0 +1,144 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-10-05 16:04:56.051107",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "posting_date",
+  "status",
+  "fcm",
+  "column_break_zevi",
+  "expiry_date",
+  "seen",
+  "section_break_zeyi",
+  "title",
+  "user",
+  "body",
+  "user_fcm_token",
+  "column_break_asmp",
+  "payload_type",
+  "payload_data",
+  "ref_doctype",
+  "ref_doctype_name"
+ ],
+ "fields": [
+  {
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Posting Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_zevi",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "expiry_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Expiry Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "\nQueue\nSent\nFail",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "fcm",
+   "fieldtype": "Check",
+   "label": "FCM"
+  },
+  {
+   "fieldname": "section_break_zeyi",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Title"
+  },
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "label": "User",
+   "options": "User"
+  },
+  {
+   "fieldname": "body",
+   "fieldtype": "Small Text",
+   "label": "Body"
+  },
+  {
+   "fetch_from": "user.user_fcm_token",
+   "fieldname": "user_fcm_token",
+   "fieldtype": "Small Text",
+   "label": "User FCM Token"
+  },
+  {
+   "fieldname": "column_break_asmp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "payload_type",
+   "fieldtype": "Select",
+   "label": "Payload Type",
+   "options": "\nlocation\nstring\nurl\nembed"
+  },
+  {
+   "fieldname": "payload_data",
+   "fieldtype": "Small Text",
+   "label": "payload Data"
+  },
+  {
+   "fieldname": "ref_doctype",
+   "fieldtype": "Select",
+   "label": "Ref Doctype",
+   "options": "\nWork Order\nPurchase Order\nDelivery Note\nQuality Inspection"
+  },
+  {
+   "fieldname": "ref_doctype_name",
+   "fieldtype": "Dynamic Link",
+   "label": "Ref Doctype Name",
+   "options": "ref_doctype"
+  },
+  {
+   "default": "0",
+   "fieldname": "seen",
+   "fieldtype": "Check",
+   "label": "Seen"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-10-05 16:17:30.304191",
+ "modified_by": "Administrator",
+ "module": "Mtpl Api",
+ "name": "FCM Notification",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
