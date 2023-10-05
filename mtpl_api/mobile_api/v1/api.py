@@ -328,6 +328,16 @@ def get_qc_template(item, operation):
     except Exception as e:
         return exception_handler(e)
     
+@frappe.whitelist()
+@mtpl_validate(methods=["GET"])
+def get_workorder_record_list():
+    try:  
+        data = frappe.get_list("Work Order",fields= ["*"])
+        gen_response(200,"Data fetch successfully" ,data)
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted for work order")
+    except Exception as e:
+        return exception_handler(e)
     
 @frappe.whitelist()
 @mtpl_validate(methods=["GET"])
@@ -369,7 +379,7 @@ def get_crm_html():
 def fetch_event_record(reference_docname):
     try:
         query = """SELECT * from `tabEvent Participants` tep left join tabEvent te on te.name = tep.parent WHERE tep.reference_docname = '%s'"""%(reference_docname)
-        data = frappe.db.sql(query, as_list=1)
+        data = frappe.db.sql(query, as_dict=1)
         # doc = frappe.get_list('Event Participants', filters={"reference_docname": reference_docname}, fields=["*"])
         if not len(data):
             return gen_response(200 ,"No Data Found", data)
@@ -385,7 +395,7 @@ def fetch_event_record(reference_docname):
 def fetch_comment_record(lead_name):
     try:
         query = """SELECT * from `tabCRM Note` tcn WHERE tcn.parent = '%s'"""%(lead_name)
-        data = frappe.db.sql(query, as_list=1)
+        data = frappe.db.sql(query, as_dict=1)
         # doc = frappe.get_list('CRM Note', filters={"parent": lead_name}, fields=["*"])
         gen_response(200 ,"Data Fetch Succesfully", data)
     except frappe.PermissionError:
