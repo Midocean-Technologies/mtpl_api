@@ -9,6 +9,7 @@ from frappe.workflow.doctype.workflow_action.workflow_action import confirm_acti
 from mtpl_api.mobile_api.v1.api_utils import gen_response, exception_handler, generate_key, mtpl_validate
 from erpnext.stock.doctype.batch.batch import get_batch_qty
 from frappe.utils import flt, now, now_datetime, get_first_day, get_last_day, get_year_start, get_year_ending, time_diff_in_seconds, format_date
+from frappe.utils.file_manager import save_file, save_file_on_filesystem, remove_file
 
 
 @frappe.whitelist(allow_guest=True)
@@ -509,7 +510,7 @@ def get_print_format(reference_doctype, reference_name):
         return exception_handler(e)
     
 @frappe.whitelist()
-@mtpl_validate(methods=["GET"])
+@mtpl_validate(methods=["POST"])
 def update_workflow(reference_doctype, reference_name, action):
     try:
         doc = get_doc_details(reference_doctype, reference_name)
@@ -555,6 +556,48 @@ def get_related_user(reference_doctype, reference_name, action):
             data = filter_allowed_users(user_lst, doc, t)
         data = []
         gen_response(200 ,"Data Fetch Succesfully", data)
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
+
+
+@frappe.whitelist()
+@mtpl_validate(methods=["POST"])
+def attach_file():
+    try:
+        x = json.loads(frappe.request.data)
+        if not x["attachment_name"]:
+            return gen_response(500 ,"File Name Not Found")
+        fil = save_file(fname = x["attachment_name"], content=x["attachment"], dt=x["doctype"], dn=x["docname"], folder=None, decode=True, is_private=0, df='attechment')
+        return gen_response(200 ,"File Uploaded Succesfully", fil)
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
+
+@frappe.whitelist()
+@mtpl_validate(methods=["GET"])
+def get_attachment_list(doctype=None, docname=None):
+    try:
+        filter = {}
+        if doctype:
+            filter["attached_to_doctype"] = doctype
+        if docname:
+            filter["attached_to_name"] = docname
+        fileList = frappe.get_all("File", filters=filter, fields=["file_name","file_url"])
+        gen_response(200 ,"Data Fetch Succesfully", fileList)
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
+    
+@frappe.whitelist()
+@mtpl_validate(methods=["POST"])
+def delete_attachment(fid):
+    try:
+        remove_file(fid)
+        gen_response(200 ,"File Deleted Succesfully")
     except frappe.PermissionError:
         return gen_response(500, "Not permitted")
     except Exception as e:
