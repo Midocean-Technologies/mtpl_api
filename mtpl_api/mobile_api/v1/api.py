@@ -4,6 +4,8 @@ import calendar
 import frappe
 from frappe import _
 from frappe.auth import LoginManager
+from frappe.model.workflow import get_transitions, get_workflow
+from frappe.workflow.doctype.workflow_action.workflow_action import confirm_action, apply_action, apply_workflow, filter_allowed_users
 from mtpl_api.mobile_api.v1.api_utils import gen_response, exception_handler, generate_key, mtpl_validate
 from erpnext.stock.doctype.batch.batch import get_batch_qty
 from frappe.utils import flt, now, now_datetime, get_first_day, get_last_day, get_year_start, get_year_ending, time_diff_in_seconds, format_date
@@ -19,6 +21,7 @@ def login(usr, pwd):
         if frappe.response["message"] == "Logged In":
             frappe.response["user"] = login_manager.user
             frappe.response["key_details"] = generate_key(login_manager.user)
+            frappe.response["user_details"] = frappe.get_doc('User', login_manager.user)
         gen_response(200, frappe.response["message"])
     except frappe.AuthenticationError:
         gen_response(500, frappe.response["message"])
@@ -360,7 +363,7 @@ def fetch_event_record(reference_docname):
         doc = frappe.get_list('Event Participants', filters={"reference_docname": reference_docname}, fields=["*"])
         if not len(doc):
             return gen_response(200 ,"No Data Found", doc)
-        gen_response(200 ,"Data Fetch Succsfully", doc)
+        gen_response(200 ,"Data Fetch Succesfully", doc)
     except frappe.PermissionError:
         return gen_response(500, "Not permitted")
     except Exception as e:
@@ -371,8 +374,189 @@ def fetch_event_record(reference_docname):
 @mtpl_validate(methods=["GET"])
 def fetch_comment_record(lead_name):
     try:
-        doc = frappe.get_list('CRM Note', filters={"parent": lead_name}, fields=["*"])
-        gen_response(200 ,"Data Fetch Succsfully", doc)
+        query = """SELECT * from `tabCRM Note` tcn WHERE tcn.parent = '%s'"""%(lead_name)
+        data = frappe.db.sql(query, as_list=1)
+        # doc = frappe.get_list('CRM Note', filters={"parent": lead_name}, fields=["*"])
+        gen_response(200 ,"Data Fetch Succesfully", data)
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
+    
+@frappe.whitelist()
+@mtpl_validate(methods=["GET"])
+def fetch_company_record():
+    try:
+        doc = frappe.get_list('Company', fields=["*"])
+        gen_response(200 ,"Data Fetch Succesfully", doc)
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
+    
+
+@frappe.whitelist()
+@mtpl_validate(methods=["GET"])
+def get_sales_order_list():
+    try:
+        doc = frappe.get_list('Sales Order', fields=["*"])
+        gen_response(200 ,"Data Fetch Succesfully", doc)
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
+    
+@frappe.whitelist()
+@mtpl_validate(methods=["GET"])
+def get_purchase_order_list():
+    try:
+        doc = frappe.get_list('Purchase Order', fields=["*"])
+        gen_response(200 ,"Data Fetch Succesfully", doc)
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
+    
+
+@frappe.whitelist()
+@mtpl_validate(methods=["GET"])
+def get_purchase_order_list():
+    try:
+        doc = frappe.get_list('Purchase Order', fields=["*"])
+        gen_response(200 ,"Data Fetch Succesfully", doc)
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
+    
+@frappe.whitelist()
+@mtpl_validate(methods=["GET"])
+def get_document_type_list(user=None):
+    try:
+        doc = frappe.get_list('Workflow Action', filters={'status': 'Open'}, fields=['name', 'reference_name', 'reference_doctype'])
+        gen_response(200 ,"Data Fetch Succesfully", doc)
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
+	
+@frappe.whitelist()
+@mtpl_validate(methods=["GET"])
+def get_document_list(reference_doctype, user=None):
+    try:
+        lst = []
+	
+        document_list = frappe.get_list('Workflow Action', filters={'status': 'Open', 'reference_doctype': reference_doctype}, fields=['name', 'reference_name', 'reference_doctype'])
+        for row in document_list:
+            docc = {}
+            if frappe.db.exists(row.reference_doctype, row.reference_name):
+                doc = frappe.get_doc(row.reference_doctype, row.reference_name)
+                docc['reference_doctype'] = row.reference_doctype
+                docc['reference_name'] = row.reference_name
+                docc['workflow_state'] = doc.workflow_state
+                docc['status'] = get_status(doc.docstatus)
+                lst.append(docc)
+        gen_response(200 ,"Data Fetch Succesfully", lst)
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
+    
+def get_status(status):
+	if status == 0:
+		return 'Draft'
+
+	if status == 1:
+		return 'Submitted'
+	
+	if status == 2:
+		return 'Cancelled'
+
+
+@frappe.whitelist()
+@mtpl_validate(methods=["GET"])
+def get_doc_details(reference_doctype, reference_name):
+    try:
+        doc = frappe.get_doc(reference_doctype, reference_name)
+        gen_response(200 ,"Data Fetch Succesfully", doc)
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
+    
+@frappe.whitelist()
+@mtpl_validate(methods=["GET"])
+def get_workflow_action(reference_doctype, reference_name):
+    try:
+        doc = frappe.get_doc(reference_doctype, reference_name)
+        workflow = get_workflow(doc.doctype)
+        data = get_transitions(doc, workflow)
+        gen_response(200 ,"Data Fetch Succesfully", data)
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
+    
+
+@frappe.whitelist()
+@mtpl_validate(methods=["GET"])
+def get_print_format(reference_doctype, reference_name):
+    try:
+        print_format = "Standard"
+        data = frappe.get_print(doctype=reference_doctype, name=reference_name, print_format=print_format)
+        gen_response(200 ,"Data Fetch Succesfully", data)
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
+    
+@frappe.whitelist()
+@mtpl_validate(methods=["GET"])
+def update_workflow(reference_doctype, reference_name, action):
+    try:
+        doc = get_doc_details(reference_doctype, reference_name)
+        apply_workflow(doc, action)
+        gen_response(200 ,"Data Update Succesfully")
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
+    
+@frappe.whitelist()
+@mtpl_validate(methods=["GET"])
+def update_fcm_token(user, token):
+    try:
+        doc = frappe.get_doc('User', user)
+        doc.db_set('fcm_token', token)
+        frappe.db.commit()
+        gen_response(200 ,"Data Update Succesfully")
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
+
+
+@frappe.whitelist()
+@mtpl_validate(methods=["GET"])
+def get_related_user(reference_doctype, reference_name, action):
+    try:
+        doc = frappe.get_doc(reference_doctype, reference_name)
+        workflow = get_workflow(reference_doctype)
+        tr = get_transitions(doc, workflow)
+        data = None
+        t = None
+        for i in tr:
+            if i.get('action') == action:
+                t = frappe.get_doc("Workflow Transition", i.name)
+
+        user_lst = [
+            row.name for row in frappe.get_all(
+                'User', filters={'enabled': 1}, fields=['name'])
+        ]
+        if t:
+            data = filter_allowed_users(user_lst, doc, t)
+        data = []
+        gen_response(200 ,"Data Fetch Succesfully", data)
     except frappe.PermissionError:
         return gen_response(500, "Not permitted")
     except Exception as e:
