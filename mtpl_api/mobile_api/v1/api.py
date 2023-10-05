@@ -367,7 +367,7 @@ def get_crm_html():
 @mtpl_validate(methods=["GET"])
 def fetch_event_record(reference_docname):
     try:
-        query = """SELECT * from `tabEvent Participants` tep WHERE tep.reference_docname = '%s'"""%(reference_docname)
+        query = """SELECT * from `tabEvent Participants` tep left join tabEvent te on te.name = tep.parent WHERE tep.reference_docname = '%s'"""%(reference_docname)
         data = frappe.db.sql(query, as_list=1)
         # doc = frappe.get_list('Event Participants', filters={"reference_docname": reference_docname}, fields=["*"])
         if not len(data):
