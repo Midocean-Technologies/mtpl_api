@@ -19,8 +19,15 @@ def login(usr, pwd):
         # validate_employee(login_manager.user)
         login_manager.post_login()
         if frappe.response["message"] == "Logged In":
+            if not frappe.db.exists("Smart Connect User", login_manager.user):
+                return gen_response(500, "User has no permission for mobile app, Please Contect Admin")
+            
+            if frappe.get_value("Smart Connect User", login_manager.user, "enable") == 0:
+                return gen_response(500, "User has no permission for mobile app, Please Contect Admin")
+            # if frappe.get_doc("Smart Connect User", login_manager.user)
             frappe.response["user"] = login_manager.user
             frappe.response["key_details"] = generate_key(login_manager.user)
+            frappe.response["smart_user_details"] = frappe.get_doc('Smart Connect User', login_manager.user)
             frappe.response["user_details"] = frappe.get_doc('User', login_manager.user)
         gen_response(200, frappe.response["message"])
     except frappe.AuthenticationError:
@@ -360,7 +367,7 @@ def get_crm_html():
 @mtpl_validate(methods=["GET"])
 def fetch_event_record(reference_docname):
     try:
-        query = """SELECT * from `tabEvent Participants` tep WHERE tep.reference_docname = '%s'"""%(reference_docname)
+        query = """SELECT * from `tabEvent Participants` tep left join tabEvent te on te.name = tep.parent WHERE tep.reference_docname = '%s'"""%(reference_docname)
         data = frappe.db.sql(query, as_list=1)
         # doc = frappe.get_list('Event Participants', filters={"reference_docname": reference_docname}, fields=["*"])
         if not len(data):
