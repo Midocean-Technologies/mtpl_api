@@ -360,10 +360,12 @@ def get_crm_html():
 @mtpl_validate(methods=["GET"])
 def fetch_event_record(reference_docname):
     try:
-        doc = frappe.get_list('Event Participants', filters={"reference_docname": reference_docname}, fields=["*"])
-        if not len(doc):
-            return gen_response(200 ,"No Data Found", doc)
-        gen_response(200 ,"Data Fetch Succesfully", doc)
+        query = """SELECT * from `tabEvent Participants` tep WHERE tep.reference_docname = '%s'"""%(reference_docname)
+        data = frappe.db.sql(query, as_list=1)
+        # doc = frappe.get_list('Event Participants', filters={"reference_docname": reference_docname}, fields=["*"])
+        if not len(data):
+            return gen_response(200 ,"No Data Found", data)
+        gen_response(200 ,"Data Fetch Succesfully", data)
     except frappe.PermissionError:
         return gen_response(500, "Not permitted")
     except Exception as e:
@@ -416,18 +418,7 @@ def get_purchase_order_list():
         return gen_response(500, "Not permitted")
     except Exception as e:
         return exception_handler(e)
-    
 
-@frappe.whitelist()
-@mtpl_validate(methods=["GET"])
-def get_purchase_order_list():
-    try:
-        doc = frappe.get_list('Purchase Order', fields=["*"])
-        gen_response(200 ,"Data Fetch Succesfully", doc)
-    except frappe.PermissionError:
-        return gen_response(500, "Not permitted")
-    except Exception as e:
-        return exception_handler(e)
     
 @frappe.whitelist()
 @mtpl_validate(methods=["GET"])
@@ -523,11 +514,11 @@ def update_workflow(reference_doctype, reference_name, action):
         return exception_handler(e)
     
 @frappe.whitelist()
-@mtpl_validate(methods=["GET"])
+@mtpl_validate(methods=["POST"])
 def update_fcm_token(user, token):
     try:
-        doc = frappe.get_doc('User', user)
-        doc.db_set('fcm_token', token)
+        doc = frappe.get_doc('Smart Connect User', user)
+        doc.db_set('user_fcm_token', token)
         frappe.db.commit()
         gen_response(200 ,"Data Update Succesfully")
     except frappe.PermissionError:
