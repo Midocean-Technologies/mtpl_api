@@ -1,0 +1,159 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:user",
+ "creation": "2023-10-05 13:10:07.301497",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "user",
+  "user_fcm_token",
+  "column_break_uysi",
+  "enable",
+  "section_break_xkny",
+  "module_list_section",
+  "crm",
+  "purchase_order",
+  "column_break_npu5",
+  "document",
+  "column_break_ez1z",
+  "sales_order",
+  "section_break_gfkw",
+  "notification_crm",
+  "notification_purchase_order",
+  "column_break_alrc",
+  "notification_document",
+  "column_break_z4ls",
+  "notification_sales_order"
+ ],
+ "fields": [
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "label": "User",
+   "options": "User",
+   "unique": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "enable",
+   "fieldtype": "Check",
+   "label": "Enable"
+  },
+  {
+   "fieldname": "section_break_xkny",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "module_list_section",
+   "fieldtype": "Section Break",
+   "label": "Module List "
+  },
+  {
+   "default": "0",
+   "fieldname": "crm",
+   "fieldtype": "Check",
+   "label": "CRM"
+  },
+  {
+   "default": "0",
+   "fieldname": "document",
+   "fieldtype": "Check",
+   "label": "Document"
+  },
+  {
+   "default": "0",
+   "fieldname": "sales_order",
+   "fieldtype": "Check",
+   "label": "Sales Order"
+  },
+  {
+   "default": "0",
+   "fieldname": "purchase_order",
+   "fieldtype": "Check",
+   "label": "Purchase Order"
+  },
+  {
+   "fieldname": "section_break_gfkw",
+   "fieldtype": "Section Break",
+   "label": " Notification Permission"
+  },
+  {
+   "fieldname": "column_break_npu5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_ez1z",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "notification_crm",
+   "fieldtype": "Check",
+   "label": "CRM"
+  },
+  {
+   "fieldname": "column_break_alrc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "notification_document",
+   "fieldtype": "Check",
+   "label": "Document"
+  },
+  {
+   "fieldname": "column_break_z4ls",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "notification_purchase_order",
+   "fieldtype": "Check",
+   "label": "Purchase Order"
+  },
+  {
+   "default": "0",
+   "fieldname": "notification_sales_order",
+   "fieldtype": "Check",
+   "label": "Sales Order"
+  },
+  {
+   "fieldname": "column_break_uysi",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "user.fcm_token",
+   "fieldname": "user_fcm_token",
+   "fieldtype": "Small Text",
+   "label": "User FCM Token "
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-10-05 15:20:52.031264",
+ "modified_by": "Administrator",
+ "module": "Mtpl Api",
+ "name": "Smart Connect User",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
