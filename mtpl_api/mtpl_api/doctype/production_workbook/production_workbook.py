@@ -113,7 +113,7 @@ class ProductionWorkbook(Document):
 		st.work_order = woDoc.name
 		st.save()
 		st.submit()
-		self.db_set("Stock Entry", st.name)
+		self.db_set("stock_entry", st.name)
 		return st.name
 
 
