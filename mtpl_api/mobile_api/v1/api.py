@@ -612,3 +612,17 @@ def delete_attachment(fid):
         return gen_response(500, "Not permitted")
     except Exception as e:
         return exception_handler(e)
+    
+
+@frappe.whitelist()
+@mtpl_validate(methods=["POST"])
+def submit_production_workbook(record):
+    try:
+        Doc = frappe.get_doc("Production Workbook", record)
+        Doc.submit()
+        gen_response(200 ,"Record Submitted Succesfully")
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        print(e)
+        return exception_handler(e)

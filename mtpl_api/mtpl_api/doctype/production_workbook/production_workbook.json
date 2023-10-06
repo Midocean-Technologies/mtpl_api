@@ -17,9 +17,7 @@
   "column_break_2",
   "posting_time",
   "operation",
-  "qty__kg_",
-  "qty__nos_",
-  "qty_sfg",
+  "qty",
   "pending_qty",
   "employee",
   "column_break_8",
@@ -28,8 +26,6 @@
   "to_time",
   "job_card",
   "stock_entry",
-  "rejection_qty__nos_",
-  "rejection_qty__kg_",
   "from_jobcard",
   "machine_qty",
   "section_break_12",
@@ -95,23 +91,6 @@
    "reqd": 1
   },
   {
-   "fieldname": "qty__kg_",
-   "fieldtype": "Float",
-   "label": "Qty ( KG )",
-   "reqd": 1
-  },
-  {
-   "fieldname": "qty__nos_",
-   "fieldtype": "Float",
-   "label": "Qty ( Nos )",
-   "reqd": 1
-  },
-  {
-   "fieldname": "qty_sfg",
-   "fieldtype": "Float",
-   "label": "Qty (SFG)"
-  },
-  {
    "fieldname": "pending_qty",
    "fieldtype": "Float",
    "label": "Pending Qty"
@@ -156,16 +135,6 @@
    "read_only": 1
   },
   {
-   "fieldname": "rejection_qty__nos_",
-   "fieldtype": "Float",
-   "label": "Rejection Qty ( Nos )"
-  },
-  {
-   "fieldname": "rejection_qty__kg_",
-   "fieldtype": "Float",
-   "label": "Rejection Qty ( Kg )"
-  },
-  {
    "default": "0",
    "fieldname": "from_jobcard",
    "fieldtype": "Check",
@@ -189,12 +158,18 @@
    "options": "Production Workbook",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "qty",
+   "fieldtype": "Float",
+   "label": "Qty ",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-09-01 19:19:13.566133",
+ "modified": "2023-10-06 12:01:09.061603",
  "modified_by": "Administrator",
  "module": "Mtpl Api",
  "name": "Production Workbook",
