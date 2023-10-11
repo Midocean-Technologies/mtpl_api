@@ -583,7 +583,8 @@ def get_print_format(reference_doctype, reference_name):
 @mtpl_validate(methods=["POST"])
 def update_workflow(reference_doctype, reference_name, action):
     try:
-        doc = get_doc_details(reference_doctype, reference_name)
+        # doc = get_doc_details(reference_doctype, reference_name)
+        doc = frappe.get_doc(reference_doctype, reference_name)
         apply_workflow(doc, action)
         gen_response(200 ,"Data Update Succesfully")
     except frappe.PermissionError:
