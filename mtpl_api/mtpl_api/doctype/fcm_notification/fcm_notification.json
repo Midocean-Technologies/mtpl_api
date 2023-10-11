@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "FCM.#####",
  "creation": "2023-10-05 16:04:56.051107",
  "default_view": "List",
  "doctype": "DocType",
@@ -119,10 +120,11 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-10-05 16:17:30.304191",
+ "modified": "2023-10-09 19:00:10.149713",
  "modified_by": "Administrator",
  "module": "Mtpl Api",
  "name": "FCM Notification",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {

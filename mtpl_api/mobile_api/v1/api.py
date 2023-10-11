@@ -509,6 +509,28 @@ def get_document_list(reference_doctype, user=None):
     except Exception as e:
         return exception_handler(e)
     
+@frappe.whitelist()
+@mtpl_validate(methods=["GET"])
+def get_document_list_5_record(user=None):
+    try:
+        lst = []
+	
+        document_list = frappe.get_list('Workflow Action', filters={'status': 'Open'}, fields=['name', 'reference_name', 'reference_doctype'], limit_page_length=5)
+        for row in document_list:
+            docc = {}
+            if frappe.db.exists(row.reference_doctype, row.reference_name):
+                doc = frappe.get_doc(row.reference_doctype, row.reference_name)
+                docc['reference_doctype'] = row.reference_doctype
+                docc['reference_name'] = row.reference_name
+                docc['workflow_state'] = doc.workflow_state
+                docc['status'] = get_status(doc.docstatus)
+                lst.append(docc)
+        gen_response(200 ,"Data Fetch Succesfully", lst)
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
+    
 def get_status(status):
 	if status == 0:
 		return 'Draft'
