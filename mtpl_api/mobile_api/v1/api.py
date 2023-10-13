@@ -769,3 +769,17 @@ def get_data_from_barcode(data):
     except Exception as e:
         return exception_handler(e)
     
+
+@frappe.whitelist()
+@mtpl_validate(methods=["GET"])
+def get_qc_template(item, operation):
+    try:
+        itemDoc = frappe.get_doc("Item", item)
+        for i in itemDoc.item_qc:
+            if i.operation == operation:
+                gen_response(200 ,"Data Fetch Succesfully", i.quality_inspection_template)
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
+    
