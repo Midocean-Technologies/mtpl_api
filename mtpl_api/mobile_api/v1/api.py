@@ -649,3 +649,85 @@ def submit_production_workbook(record):
     except Exception as e:
         print(e)
         return exception_handler(e)
+    
+@frappe.whitelist()
+@mtpl_validate(methods=["GET"])
+def check_rm_transfer(record=None, work_order=None):
+    try:
+        if record != "null":
+            x = production_workbook_rm_check(record)
+        if work_order != "null":
+            x = work_order_rm_check(work_order)
+        gen_response(200 ,"Data Fetch Succesfully", x)
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
+
+def production_workbook_rm_check(record):
+    temp = {}
+    pwDoc = frappe.get_doc("Production Workbook", record)
+    woDoc = frappe.get_doc("Work Order", pwDoc.work_order)
+    bomDoc = frappe.get_doc("BOM", woDoc.bom_no)
+    if pwDoc.operation == woDoc.operations[0].operation:
+        x_qty = 0
+        pwList = frappe.get_list("Production Workbook", filters={"work_order":pwDoc.work_order}, fields=["qty"])
+        if pwList:
+            for i in pwList:
+                x_qty += i.qty
+
+        rm_qty = 0
+        for j in bomDoc.items:
+            rm_qty += j.qty
+
+        qty = (x_qty * rm_qty ) / flt(bomDoc.quantity)
+
+        for k in woDoc.required_items:
+            if k.transferred_qty < qty:
+                temp["status"] = 0
+                temp["text"] = "Material Need to Transferred"
+                return temp
+            else:
+                temp["status"] = 1
+                temp["text"] = "Material Already Transferred"
+                return temp
+    else:
+        temp["status"] = 1
+        temp["text"] = "Material Already Transferred"
+        return temp
+    
+def work_order_rm_check(work_order):
+    temp = {}
+    woDoc = frappe.get_doc("Work Order", work_order)
+    temp["status"] = 1
+    for k in woDoc.required_items:
+        temp["text"] = "Requierd Material : {0} - Transferred Material {1}".format(round(k.required_qty,3), round(k.transferred_qty,3))
+    return temp
+
+@frappe.whitelist()
+@mtpl_validate(methods=["GET"])
+def get_data_from_barcode(data):
+    try:
+        res = {}
+        if not data:
+            res = {'status':0, 'message': 'data not found'}
+
+        if frappe.db.exists("Item", data):
+            itemDoc = frappe.get_doc("Item", data)
+            res = {'item_code': itemDoc.name, 'uom': itemDoc.stock_uom}
+        
+        if frappe.db.exists("Batch", data):
+            batchDoc = frappe.get_doc("Batch", data)
+            itemDoc = frappe.get_doc("Item", batchDoc.item)
+            res = {'item_code': itemDoc.name, 'uom': itemDoc.stock_uom}
+
+        if frappe.db.exists("Serial No", data):
+            srDoc = frappe.get_doc("Serial No", data)
+            itemDoc = frappe.get_doc("Item", srDoc.item_code)
+            res = {'item_code': itemDoc.name, 'uom': itemDoc.stock_uom}
+        gen_response(200 ,"Data Fetch Succesfully", res)
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
+    
