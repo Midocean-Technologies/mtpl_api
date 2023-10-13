@@ -4,6 +4,7 @@ import calendar
 import frappe
 from frappe import _
 from frappe.auth import LoginManager
+from datetime import datetime
 from frappe.model.workflow import get_transitions, get_workflow
 from frappe.workflow.doctype.workflow_action.workflow_action import confirm_action, apply_action, apply_workflow, filter_allowed_users
 from mtpl_api.mobile_api.v1.api_utils import gen_response, exception_handler, generate_key, mtpl_validate
@@ -586,7 +587,7 @@ def update_workflow(reference_doctype, reference_name, action):
         # doc = get_doc_details(reference_doctype, reference_name)
         doc = frappe.get_doc(reference_doctype, reference_name)
         apply_workflow(doc, action)
-        gen_response(200 ,"Data Update Succesfully")
+        gen_response(200 ,"Workflow Updated")
     except frappe.PermissionError:
         return gen_response(500, "Not permitted")
     except Exception as e:
@@ -783,3 +784,427 @@ def get_qc_template(item, operation):
     except Exception as e:
         return exception_handler(e)
     
+@frappe.whitelist()
+@mtpl_validate(methods=["GET"])
+def item_report(item=None):
+    try:
+        where_clause = ''
+        
+        if item:
+            where_clause += " and tsoi.item_code = '%s' " % (item)
+        
+
+        query = """
+
+            SELECT tsoi.item_code, tsoi.item_name, tsoi.stock_uom, tsoi.valuation_rate,
+            IFNULL(so.total_quantity, 0) AS sales_order_quantity,
+            IFNULL(po.total_quantity, 0) AS purchase_order_quantity
+            FROM tabItem tsoi
+                
+                LEFT JOIN (
+                    SELECT item_code, SUM(qty) AS total_quantity
+                    FROM `tabSales Order Item`
+                    GROUP BY item_code
+                ) so ON tsoi.item_code = so.item_code
+                LEFT JOIN (
+                    SELECT item_code, SUM(qty) AS total_quantity
+                    FROM `tabPurchase Order Item`
+                    GROUP BY item_code
+                ) po ON tsoi.item_code = po.item_code
+                WHERE 1 = 1
+                %s
+            """%(where_clause)
+
+        data = frappe.db.sql(query, as_list=1)
+        html = """ <style>
+                    h1,h2,h3,h4,h5,p{
+                        margin: 0 !important;
+                    }
+                    .section-6{
+                        padding: 1rem;
+                    }
+                    details {
+                        border: 1px solid #d4d4d4;    
+                        padding: .75em .75em 0;
+                        margin-top: 10px;
+                        box-shadow:0 0 20px #d4d4d4;
+                    }
+                    
+                    summary {	
+                        font-weight: bold;
+                        margin: -.75em -.75em 0;
+                        padding: .75em;
+                        background-color: #5f75a4;
+                        color: #fff;
+                    }
+                    
+                    details[open] {
+                        padding: .75em;
+                        border-bottom: 1px solid #d4d4d4;
+                    }
+                    
+                    details[open] summary {
+                        border-bottom: 1px solid #d4d4d4;
+                        margin-bottom: 10px;
+                    }
+
+                    .table{
+                        margin: 0 !important;
+                        width: 100%;
+                    }
+                    .table th, .table td{
+                        padding: 0.3rem;
+                    }
+                    .table thead th{
+                        border-bottom: 2px solid #46494d;
+                    }
+                    .table-bordered {
+                        border: 1px solid #1b1c1e;
+                    }
+                    .table-bordered th, .table-bordered td{
+                        border: 1px solid #7c7f86;
+                    }
+                </style>"""
+        html += """
+        <body>
+            <div class="section-6">
+            <table class="table table-bordered" style="font-size:15px; margin-bottom:15px;">
+                <tr style="background-color: #00bfff">
+                    <td style="font-weight: bold;">Item Name</td>
+                    <td style="font-weight: bold;">Item Code</td>
+                    <td style="font-weight: bold;">UOM</td>
+                    <td style="font-weight: bold;">Valuation Rate</td>
+
+                    <td style="font-weight: bold;">Total sale Qty</td>
+                    <td style="font-weight: bold;">Total Purchase Qty</td>
+
+                </tr>"""
+        
+
+        so_list = []
+        for so in data:
+            so_list.append(str(so[1]))
+        used_so_list = []
+
+    
+        for i in data:
+            no_of_so = so_list.count(str(i[1]))
+            if str(i[1]) not in used_so_list:
+                html += """<tr>"""
+                html += """<td rowspan=%s>%s</td>"""%(no_of_so, str(i[1]))
+                used_so_list.append(str(i[1]))
+
+            html +="""
+                        <td>%s</td>
+                        <td>%s</td>
+                        <td>%s</td>
+                        <td>%s</td>
+                        <td>%s</td>
+                    </tr>
+                """%(str(i[0]), str(i[2]), "{:,.0f}".format(i[3]), "{:,.0f}".format(i[4]), "{:,.0f}".format(i[5]))
+        html += """
+        </table>
+        </div>
+        </body>
+            """
+        gen_response(200 ,"Data Fetch Succesfully", html)
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
+    
+
+@frappe.whitelist()
+@mtpl_validate(methods=["GET"])
+def sales_order_report(customer=None, item=None):
+    try:
+        where_clause = ''
+        
+        if customer:
+            where_clause += " and tso.customer = '%s' " % (customer)
+        
+        if item:
+            where_clause += " and tsoi.item_code = '%s' " % (item)
+        
+
+        query = """
+            SELECT 
+                    tsoi.parent,
+                    tso.customer,
+                    tsoi.item_code,
+                    tsoi.qty,
+                    tsoi.uom,
+                    tsoi.rate,
+                    tsoi.amount
+                FROM `tabSales Order Item` tsoi
+                LEFT JOIN `tabSales Order` tso 
+                ON tso.name = tsoi.parent 
+                WHERE 1 = 1
+                AND tsoi.delivered_qty != tsoi.qty
+                %s
+                ORDER by tsoi.parent DESC
+            """%(where_clause)
+
+        data = frappe.db.sql(query, as_list=1)
+        html = """ <style>
+                    h1,h2,h3,h4,h5,p{
+                        margin: 0 !important;
+                    }
+                    .section-6{
+                        padding: 1rem;
+                    }
+                    details {
+                        border: 1px solid #d4d4d4;    
+                        padding: .75em .75em 0;
+                        margin-top: 10px;
+                        box-shadow:0 0 20px #d4d4d4;
+                    }
+                    
+                    summary {	
+                        font-weight: bold;
+                        margin: -.75em -.75em 0;
+                        padding: .75em;
+                        background-color: #5f75a4;
+                        color: #fff;
+                    }
+                    
+                    details[open] {
+                        padding: .75em;
+                        border-bottom: 1px solid #d4d4d4;
+                    }
+                    
+                    details[open] summary {
+                        border-bottom: 1px solid #d4d4d4;
+                        margin-bottom: 10px;
+                    }
+
+                    .table{
+                        margin: 0 !important;
+                        width: 100%;
+                    }
+                    .table th, .table td{
+                        padding: 0.3rem;
+                    }
+                    .table thead th{
+                        border-bottom: 2px solid #46494d;
+                    }
+                    .table-bordered {
+                        border: 1px solid #1b1c1e;
+                    }
+                    .table-bordered th, .table-bordered td{
+                        border: 1px solid #7c7f86;
+                    }
+                </style>"""
+        html += """
+        <body>
+            <div class="section-6">
+            <table class="table table-bordered" style="font-size:18px; margin-bottom:15px;" width=100%>
+                <tr style="background-color: #adcfee">
+                    <td style="font-weight: bold;" width=25%>Customer</td>
+                    <td style="font-weight: bold;" width=15%>Sales Order</td>
+                    <td style="font-weight: bold;" width=20%>Item</td>
+                    <td style="font-weight: bold;">Qty</td>
+                    <td style="font-weight: bold;">UOM</td>
+                    <td style="font-weight: bold;">Rate</td>
+                    <td style="font-weight: bold;">Amount</td>
+                </tr>"""
+        
+    
+        customer = []
+        for i in data:
+            customer.append(i[1])
+        cus = list(set(customer))
+        
+
+        so_list = []
+        for so in data:
+            so_list.append(str(so[1]))
+        used_so_list = []
+        total_amount = 0
+
+    
+        customer_amounts = {}
+        for x in data:
+            customer = x[1]
+            amount = x[6]
+
+            if customer in customer_amounts:
+                customer_amounts[customer] += amount
+            else:
+                customer_amounts[customer] = amount
+
+        # #(customer_amounts)
+
+        for x in cus:
+            sum=0
+
+                    
+            for i in data:
+                if x == i[1]:
+                    no_of_so = so_list.count(str(i[1]))
+                    if str(i[1]) not in used_so_list:
+                        html += """<tr>"""
+                        html += """<td rowspan=%s>%s</td>"""%(no_of_so, str(i[1]))
+                        used_so_list.append(str(i[1]))
+
+                    html +="""
+                                <td>%s</td>
+                                <td>%s</td>
+                                <td>%s</td>
+                                <td>%s</td>
+                                <td>₹ %s</td>
+                                <td>₹ %s</td>
+                            </tr>
+                        """%(str(i[0]), str(i[2]), str(i[3]), str(i[4]),round(i[5]), round(i[6]))
+                    sum += i[6]
+            
+            html += """<tr><td colspan="6">Total Amount</td><td>₹ %s</td></tr>""" % (round(sum))
+        html += """
+        </table>
+        </div>
+        </body>
+            """
+        gen_response(200 ,"Data Fetch Succesfully", html)
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
+    
+@frappe.whitelist()
+@mtpl_validate(methods=["GET"])
+def purchase_order_pending_received_qty(purchase_order=None, supplier=None, item=None, required_date=None):
+    try:
+        where_clause = ''
+        if item:
+            where_clause += " and tpoi.item_code = '%s' " % (item)
+
+        if purchase_order:
+            where_clause += " and tpoi.parent = '%s' " % (purchase_order)
+        
+        if supplier:
+            where_clause += " and tpo.supplier = '%s' " % (supplier)
+
+        if required_date:
+            date = datetime.strptime(required_date, "%d-%m-%Y").strftime("%Y-%m-%d")
+            where_clause += " and tpoi.schedule_date = '%s' " % (date)
+
+        query = """
+            SELECT 
+                tpo.name,
+                tpo.supplier,
+                tpo.transaction_date,
+                tpoi.item_code,
+                tpoi.schedule_date,
+                tpoi.qty,
+                tpoi.uom,
+                tpoi.received_qty
+                FROM  
+                `tabPurchase Order Item` tpoi 
+                Left Join `tabPurchase Order` tpo 
+                on tpo.name = tpoi.parent
+                WHERE tpo.docstatus = '1'
+                AND tpoi.received_qty != tpoi.qty
+                %s
+                ORDER BY tpo.name DESC
+
+            """%(where_clause)
+
+        data = frappe.db.sql(query, as_list=1)
+        html = """ <style>
+                    h1,h2,h3,h4,h5,p{
+                        margin: 0 !important;
+                    }
+                    .section-6{
+                        padding: 1rem;
+                    }
+                    details {
+                        border: 1px solid #d4d4d4;    
+                        padding: .75em .75em 0;
+                        margin-top: 10px;
+                        box-shadow:0 0 20px #d4d4d4;
+                    }
+                    
+                    summary {	
+                        font-weight: bold;
+                        margin: -.75em -.75em 0;
+                        padding: .75em;
+                        background-color: #5f75a4;
+                        color: #fff;
+                    }
+                    
+                    details[open] {
+                        padding: .75em;
+                        border-bottom: 1px solid #d4d4d4;
+                    }
+                    
+                    details[open] summary {
+                        border-bottom: 1px solid #d4d4d4;
+                        margin-bottom: 10px;
+                    }
+
+                    .table{
+                        margin: 0 !important;
+                        width: 100%;
+                    }
+                    .table th, .table td{
+                        padding: 0.3rem;
+                    }
+                    .table thead th{
+                        border-bottom: 2px solid #46494d;
+                    }
+                    .table-bordered {
+                        border: 1px solid #1b1c1e;
+                    }
+                    .table-bordered th, .table-bordered td{
+                        border: 1px solid #7c7f86;
+                    }
+                </style>"""
+        html += """
+        <body>
+            <div class="section-6">
+            <table class="table table-bordered" style="font-size:15px; margin-bottom:15px;">
+                <tr style="background-color: #adcfee">
+                    <td style="font-weight: bold;">Purchase Order</td>
+                    <td style="font-weight: bold;">Supplier</td>
+                    <td style="font-weight: bold;">Purchase Order Date</td>
+                    <td style="font-weight: bold;">Item</td>
+                    <td style="font-weight: bold;">Required Date</td>
+                    <td style="font-weight: bold;">Qty</td>
+                    <td style="font-weight: bold;">UOM</td>
+                    <td style="font-weight: bold;">Received Qty</td>
+                    <td style="font-weight: bold;">Pending Received Qty</td>
+                </tr>"""
+        
+        po_list = []
+        for po in data:
+            po_list.append(str(po[0]))
+        used_po_list = []
+        for i in data:
+            no_of_so = po_list.count(str(i[0]))
+            if str(i[0]) not in used_po_list:
+                html += """<tr>"""
+                html += """<td rowspan=%s>%s</td>"""%(no_of_so, str(i[0]))
+                used_po_list.append(str(i[0]))
+
+            html +="""
+                        <td>%s</td>
+                        <td>%s</td>
+                        <td>%s</td>
+                        <td>%s</td>
+                        <td>%s</td>
+                        <td>%s</td>
+                        <td>%s</td>
+                        <td>%s</td>
+                    </tr>
+                """%(i[1], i[2], i[3], i[4], str(round(flt(i[5]),2)), i[6], str(round(flt(i[7]),2)), str(round(flt(i[5]),2) - round(flt(i[7]),2)))
+        html += """
+        </table>
+        </div>
+        </body>
+            """
+        gen_response(200 ,"Data Fetch Succesfully", html)
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
+
