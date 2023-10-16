@@ -1208,3 +1208,19 @@ def purchase_order_pending_received_qty(purchase_order=None, supplier=None, item
     except Exception as e:
         return exception_handler(e)
 
+
+
+@frappe.whitelist()
+@mtpl_validate(methods=["POST"])
+def clear_all_notification(user):
+    try:
+        notification_list = frappe.get_list("FCM Notification", filters={'user':user})
+        if notification_list:
+            for i in notification_list:
+                doc = frappe.get_doc("FCM Notification", i.name)
+                doc.db_set("seen", 1)
+        gen_response(200 ,"Notification Cleared Succesfully")
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
