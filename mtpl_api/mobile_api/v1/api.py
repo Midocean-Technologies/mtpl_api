@@ -379,8 +379,23 @@ def validate_item_batch(item):
 @mtpl_validate(methods=["GET"])
 def validate_item_uom(item):
     try:
+        res = {}
+        res["uom"] = None
+        res["selling_rate"] = 0
+        res["buying_rate"] = 0
         doc = frappe.get_doc("Item", item)
-        gen_response(200, "Data fetch successfully", doc.stock_uom)
+        res["uom"] = doc.stock_uom
+        item_price_list = frappe.get_list("Item Price", filters={"item_code": item})
+        if item_price_list:
+            for i in item_price_list:
+                priceDoc = frappe.get_doc("Item Price", i.name)
+                if priceDoc.price_list == "Standard Buying":
+                    res["buying_rate"] = priceDoc.price_list_rate
+                if priceDoc.price_list == "Standard Selling":
+                    res["selling_rate"] = priceDoc.price_list_rate
+
+
+        gen_response(200, "Data fetch successfully", res)
     except frappe.PermissionError:
         return gen_response(500, "Not permitted for work order")
     except Exception as e:
@@ -1220,6 +1235,20 @@ def clear_all_notification(user):
                 doc = frappe.get_doc("FCM Notification", i.name)
                 doc.db_set("seen", 1)
         gen_response(200 ,"Notification Cleared Succesfully")
+    except frappe.PermissionError:
+        return gen_response(500, "Not permitted")
+    except Exception as e:
+        return exception_handler(e)
+
+
+@frappe.whitelist()
+@mtpl_validate(methods=["GET"])
+def get_qc_template(item, operation):
+    try:
+        itemDoc = frappe.get_doc("Item", item)
+        for i in itemDoc.item_qc:
+            if i.operation == operation:
+                gen_response(200 ,"Template Fetch Succesfully", i.quality_inspection_template)
     except frappe.PermissionError:
         return gen_response(500, "Not permitted")
     except Exception as e:
