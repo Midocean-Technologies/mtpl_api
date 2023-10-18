@@ -517,6 +517,7 @@ def get_document_list(reference_doctype, user=None):
                 docc['reference_doctype'] = row.reference_doctype
                 docc['reference_name'] = row.reference_name
                 docc['workflow_state'] = doc.workflow_state
+                docc['title'] = doc.title
                 docc['status'] = get_status(doc.docstatus)
                 lst.append(docc)
         gen_response(200 ,"Data Fetch Succesfully", lst)
@@ -588,6 +589,12 @@ def get_workflow_action(reference_doctype, reference_name):
 def get_print_format(reference_doctype, reference_name):
     try:
         print_format = "Standard"
+        smart_setting = frappe.get_single("Smart Connect Setting")
+        if smart_setting.print_format:
+            for i in smart_setting.print_format:
+                if i.doctype_name == reference_doctype:
+                    print_format = i.print_format
+                    
         data = frappe.get_print(doctype=reference_doctype, name=reference_name, print_format=print_format)
         gen_response(200 ,"Data Fetch Succesfully", data)
     except frappe.PermissionError:
