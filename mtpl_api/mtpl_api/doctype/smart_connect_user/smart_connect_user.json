@@ -12,6 +12,7 @@
   "user_fcm_token",
   "column_break_uysi",
   "enable",
+  "notification_enable",
   "section_break_xkny",
   "module_list_section",
   "crm",
@@ -128,11 +129,17 @@
    "fieldname": "user_fcm_token",
    "fieldtype": "Small Text",
    "label": "User FCM Token "
+  },
+  {
+   "default": "0",
+   "fieldname": "notification_enable",
+   "fieldtype": "Check",
+   "label": "Notification Enable"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-10-05 16:34:52.808534",
+ "modified": "2023-10-20 16:17:06.953868",
  "modified_by": "Administrator",
  "module": "Mtpl Api",
  "name": "Smart Connect User",
