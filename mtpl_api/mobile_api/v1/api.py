@@ -6,12 +6,12 @@ from frappe import _
 from frappe.auth import LoginManager
 from datetime import datetime
 from frappe.model.workflow import get_transitions, get_workflow
-from frappe.workflow.doctype.workflow_action.workflow_action import confirm_action, apply_action, apply_workflow, filter_allowed_users
+# from frappe.workflow.doctype.workflow_action.workflow_action import confirm_action, apply_action, apply_workflow, filter_allowed_users
 from mtpl_api.mobile_api.v1.api_utils import gen_response, exception_handler, generate_key, mtpl_validate
 from erpnext.stock.doctype.batch.batch import get_batch_qty
 from frappe.utils import flt, now, now_datetime, get_first_day, get_last_day, get_year_start, get_year_ending, time_diff_in_seconds, format_date
 from frappe.utils.file_manager import save_file, save_file_on_filesystem, remove_file
-
+from frappe.frappe.workflow.doctype.workflow_action.workflow_action import confirm_action , apply_action, apply_workflow
 
 @frappe.whitelist(allow_guest=True)
 def login(usr, pwd):
@@ -647,8 +647,8 @@ def get_related_user(reference_doctype, reference_name, action):
             row.name for row in frappe.get_all(
                 'User', filters={'enabled': 1}, fields=['name'])
         ]
-        if t:
-            data = filter_allowed_users(user_lst, doc, t)
+        # if t:
+        #     data = filter_allowed_users(user_lst, doc, t)
         data = []
         gen_response(200 ,"Data Fetch Succesfully", data)
     except frappe.PermissionError:
