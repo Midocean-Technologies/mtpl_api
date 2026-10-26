@@ -10,7 +10,7 @@ from mtpl_api.mobile_api.v100.api_utils import gen_response, exception_handler, 
 
 #===================  Work order Summary report========================
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def workorder_summary_report(item=None, work_order=None,operation=None):
     
     where_clause = ''
@@ -351,7 +351,7 @@ def stock_balance_by_warehouse(item=None, warehouse=None):
 
 #========================= WORK ORDER WITH OPERATION  ====================
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def work_order_with_operations(item=None, work_order=None):
     where_clause = ''
     if item:
@@ -1094,7 +1094,7 @@ def so_report_by_customer(customer=None, item=None):
     except Exception as e:
         return exception_handler(e)
 
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 # def get_tracebility(sales_order=None, work_order=None, batch=None, delivery_note=None):
 #     try:
 #         x = get_traceability_report(sales_order=sales_order, work_order=work_order, batch=batch, delivery_note=delivery_note)
