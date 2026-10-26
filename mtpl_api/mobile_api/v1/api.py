@@ -13,7 +13,7 @@ from frappe.utils import flt, now, now_datetime, get_first_day, get_last_day, ge
 from frappe.utils.file_manager import save_file, save_file_on_filesystem, remove_file
 
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def login(usr, pwd):
     try:
         login_manager = LoginManager()
